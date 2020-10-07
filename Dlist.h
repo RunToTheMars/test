@@ -11,7 +11,7 @@ struct DlistItem {
 
 class Dlist{
     private:
-        DlistItem base, *current, *after, *before ;
+        DlistItem base, *current, *after, *before ;//
         void GoToEnd(); //Переход в конец списка
         void GoToBeg(); //Переход в начало списка
         bool GoToNext(); //Переход к следующему
