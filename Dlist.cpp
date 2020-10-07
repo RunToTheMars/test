@@ -3,7 +3,7 @@
 #include<iostream>
 using namespace std;
 Dlist:: Dlist(){  
-    base.str=NULL;
+    base.str=nullptr;
     base.lenofstr=0;
     base.next=base.prev=&base;
     current=after=before=&base;
