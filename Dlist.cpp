@@ -22,8 +22,8 @@ void Dlist:: GoToEnd(){
 bool Dlist:: GoToNext(){  
     if(AtEnd()) return false;
     current=current->next;
-    after=after->next;//
-    before=current->prev;//
+    after=after->next;
+    before=current->prev;
     return true;
 }
 
