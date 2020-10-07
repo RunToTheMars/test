@@ -22,8 +22,8 @@ void Dlist:: GoToEnd(){
 bool Dlist:: GoToNext(){  
     if(AtEnd()) return false;
     current=current->next;
-    after=after->next;
-    before=current->prev;
+    after=after->next;//
+    before=current->prev;//
     return true;
 }
 
@@ -35,7 +35,6 @@ bool Dlist:: DelAfter(){
     DlistItem* tmp=after;
     after=after->next;
     delete tmp;
-    current->prev=before;
     return true;
 }
 
@@ -51,19 +50,15 @@ Dlist:: ~Dlist(){
 Dlist:: Dlist(char *stroka){  
     DlistItem *New=new DlistItem;
     New->lenofstr=strlen(stroka);
-    New->str=new char [strlen(stroka)];
+    New->str=new char [strlen(stroka) + 1];
     New->next=New->prev=&base;
     current=New;
-    base.str=NULL;
+    base.str=nullptr;
     base.lenofstr=0;
     base.next=base.prev=New;
     after=&base;
     before=&base;
-    for(int i=0; i<strlen(stroka);i++)
-    {
-        current->str[i]=stroka[i];
-    }
-
+    memcpy(current->str, stroka, New->lenofstr + 1);
 }
 
 void Dlist:: InsAfter_formass(char* x, int n){
@@ -71,11 +66,9 @@ void Dlist:: InsAfter_formass(char* x, int n){
     DlistItem *newelem;
     newelem=new DlistItem;
     newelem->lenofstr=n;
-    newelem->str=new char[n];
-    for(int y=0; y<n; y++){
-        newelem->str[y]=x[y];
-    }
-
+    newelem->str=new char[n+1];
+    int min_len = n > strlen(x) ? strlen(x) : n;
+    memcpy(newelem->str, x, min_len + 1);
     current->next=newelem;
     after->prev=newelem;
     newelem->next=after;
@@ -91,12 +84,9 @@ void Dlist:: InsAfter(const char* x){
     int n=strlen(x);
     DlistItem *newelem=new DlistItem;
     newelem->lenofstr=n;
-    newelem->str=NULL;
-    newelem->str=new char[n];
-    for(int y=0; y<n; y++){
-        newelem->str[y]=x[y];
-
-    }
+    newelem->str=nullptr;
+    newelem->str=new char[n+1];
+    memcpy(newelem->str, x, n + 1);
 
     //    current->next->prev = newelem;
     newelem->next=current->next;
@@ -109,7 +99,7 @@ void Dlist:: InsAfter(const char* x){
 
 }
 
-void Dlist:: InsAfterPos(const char* x, int position){ 
+void Dlist:: InsAfterPos(const char* x, int position){//
     if(position>ListLength()){
         throw Dlist_Exception(1, "Буфер имеет меньшую длину.");
         return;
@@ -187,26 +177,18 @@ void Dlist:: GoToBeg(){
 }
 
 int Dlist:: ListLength(){  
-    int len=0;
-    for(GoToBeg();!AtEnd();GoToNext()){
-        len++;
+    if(!IsEmpty())
+        return 0;
+    int res = 0;
+    for(GoToBeg();;GoToNext()){
+        res += current->lenofstr;
+        if (AtEnd())
+            break;
     }
-    if((after=before) && (after!=current)) len++;
-    int *mass=new int[len];
-    int j=0;
-    for(GoToBeg(); j<len; GoToNext()){
-        mass[j]=current->lenofstr;
-        j++;
-    }
-    int res=0;
-    for(int k=0;k<len;k++){
-        res=res+mass[k];
-    }
-    delete [] mass;
     return res;
 }
 void Dlist:: PrintList(){  
-    if(IsEmpty()==true){
+    if(IsEmpty()){
         cout<<"The buffer is empty"<<endl;
         return;
     }
@@ -229,20 +211,19 @@ void Dlist:: PrintList(){
     cout<<endl;
 }
 
-char*  Dlist:: CopyList(char *mass){ 
+char*  Dlist:: CopyList(char *mass){ //
     if(IsEmpty()==true){
         throw Dlist_Exception(3, "The buffer is empty");
-        return 0;
+        return nullptr;
     }
     GoToBeg();
-    int h=(current->lenofstr);
+    int h=strlen(mass);
     int g=0;
     for(GoToBeg();!AtEnd();GoToNext()){
         for(int i=g, j=0;(i<h) && (j<(current->lenofstr)); i++,j++)
             mass[i]=current->str[j];
         g=h;
         h+=after->lenofstr;
-
     }
     GoToEnd();
 
@@ -255,8 +236,7 @@ char*  Dlist:: CopyList(char *mass){
 
 bool Dlist:: IsEmpty(){  
     GoToBeg();
-    if(current==&base) return true;
-    else return false;
+    return current==&base;
 } 
 
 char* Dlist:: CopyElemList(char *mass, int position){  
